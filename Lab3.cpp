@@ -2,62 +2,6 @@
 
 using namespace std;
 
-class IArray {
-public:
-	virtual void set_value(int index, float value) = 0;
-	virtual float get_value(int index) = 0;
-	virtual int get_lenght() = 0;
-};
-
-class Array : public IArray {
-public:
-	float data[10];
-	virtual void set_value(int index, float value) {
-		data[index] = value;
-	}
-	virtual float get_value(int index) {
-		return data[index];
-	}
-	virtual int get_lenght() {
-		return 10;
-	}
-};
-
-//-----------------------
-
-class IList {
-public:
-	virtual float get_value() = 0;
-	virtual void first() = 0;
-	virtual void next() = 0;
-	virtual bool isEOL() = 0;
-};
-
-class MyStorage : public IList {
-
-private:
-
-	float data[10];
-	int curr;
-
-public:
-
-	float get_value() {
-		return data[curr];
-	}
-	void first() {
-		curr = 0;
-	}
-	void next() {
-		curr++;
-	}
-	bool isEOL() {
-		return curr > 9;
-	}
-};
-
-//-----------------------
-
 class CBase {
 
 public:
@@ -78,18 +22,6 @@ public:
 
 	void classname() override {
 		cout << "CDesc_1::classname\n";
-	}
-};
-
-class CDesc_1_2 : public CDesc_1 {
-public:
-
-	CDesc_1_2() {
-		cout << "CDesc_1_2::CDesc_1_2()\n";
-	}
-
-	void classname() override {
-		cout << "CDesc_1_2::classname\n";
 	}
 };
 
@@ -132,10 +64,74 @@ public:
 	}
 };
 
+//-----------------------
+
+class IList {
+public:
+	virtual void add(CBase* obj) = 0;
+	virtual CBase* get_value() = 0;
+	virtual void first() = 0;
+	virtual void next() = 0;
+	virtual bool isEOL() = 0;
+};
+
+class MyStorage : public IList {
+
+private:
+
+	CBase* data[10]{};
+	int curr{};
+
+public:
+
+	MyStorage() {
+		curr = 0;
+	}
+
+	void add(CBase* obj) {
+		data[curr] = obj;
+		curr++;
+	}
+
+	CBase* get_value() {
+		return data[curr];
+	}
+	void first() {
+		curr = 0;
+	}
+	void next() {
+		curr++;
+	}
+	bool isEOL() {
+		return curr > 9;
+	}
+};
+
+//-----------------------
+
 int main()
 {
-	
+	srand(time(0));
 
+	MyStorage* storage = new MyStorage();
 
-    return 0;
+	for (int i = 0; i < 10; i++)
+	{
+		if (rand() % 4 == 0)
+			storage->add(new CDesc_1);
+		else if (rand() % 4 == 1)
+			storage->add(new CDesc_2);
+		else if (rand() % 4 == 2)
+			storage->add(new CDesc_3);
+		else
+			storage->add(new CDesc_4);
+
+		cout << endl;
+	}
+
+	for (storage->first(); !storage->isEOL(); storage->next())
+		storage->get_value()->classname();
+
+	return 0;
 }
+
