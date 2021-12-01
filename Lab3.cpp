@@ -9,7 +9,7 @@ public:
 
 	virtual void classname() = 0;
 	virtual ~CBase() {
-		cout << "~CBase()\n";
+		cout << "~CBase()\n\n";
 	}
 };
 
@@ -19,6 +19,10 @@ public:
 
 	CDesc_1() {
 		cout << "CDesc_1::CDesc_1()\n";
+	}
+
+	~CDesc_1() {
+		cout << "CDesc_1::~CDesc_1()\n";
 	}
 
 	void classname() override {
@@ -39,11 +43,15 @@ public:
 		cout << "CDesc_2::CDesc_2()\n";
 	}
 
+	~CDesc_2() {
+		cout << "CDesc_2::~CDesc_2()\n";
+	}
+
 	void classname() override {
 		cout << "CDesc_2::classname\n";
 	}
 
-	void mew()
+	void mew() override
 	{
 		cout << "CDesc_2::mew2()\n";
 	}
@@ -55,6 +63,10 @@ public:
 
 	CDesc_3() {
 		cout << "CDesc_3::CDesc_3()\n";
+	}
+
+	~CDesc_3() {
+		cout << "CDesc_3::~CDesc_3()\n";
 	}
 
 	void classname() override {
@@ -75,11 +87,15 @@ public:
 		cout << "CDesc_4::CDesc_4()\n";
 	}
 
+	~CDesc_4() {
+		cout << "CDesc_4::~CDesc_4()\n";
+	}
+
 	void classname() override {
 		cout << "CDesc_4::classname\n";
 	}
 
-	void bark()
+	void bark() override
 	{
 		cout << "CDesc_4::bark2()\n";
 	}
@@ -171,54 +187,54 @@ public:
 
 //-----------------------
 
-void addition(MyStorage* storage) {
+void addition(MyStorage& storage) {
 
 	if (rand() % 4 == 0)
-		storage->add(new CDesc_1);
+		storage.add(new CDesc_1);
 	else if (rand() % 4 == 1)
-		storage->add(new CDesc_2);
+		storage.add(new CDesc_2);
 	else if (rand() % 4 == 2)
-		storage->add(new CDesc_3);
+		storage.add(new CDesc_3);
 	else
-		storage->add(new CDesc_4);
+		storage.add(new CDesc_4);
 
 	cout << endl;
 }
 
-void cycle(MyStorage* storage, int count) {
+void cycle(MyStorage& storage, int count) {
 
-	storage->first();
+	storage.first();
 
 	int t1 = clock();
 
 	for (int i = 0; i < count; i++)
-		if (!storage->isEOL())
+		if (!storage.isEOL())
 		{
-			if (storage->getObject() != NULL)
+			if (storage.getObject() != NULL)
 			{
 				if (rand() % 4 == 0) {
-					storage->del(storage->getObject());
-					storage->next();
+					storage.del(storage.getObject());
+					storage.next();
 				}
 				else if (rand() % 4 == 1) {
-					storage->getObject()->classname();
-					storage->next();
+					storage.getObject()->classname();
+					storage.next();
 				}
 				else if (rand() % 4 == 2)
 				{
-					if (dynamic_cast<CDesc_1*>(storage->getObject()) != NULL)
-						dynamic_cast<CDesc_1*>(storage->getObject())->mew();
-					else if (dynamic_cast<CDesc_3*>(storage->getObject()) != NULL)
-						dynamic_cast<CDesc_3*>(storage->getObject())->bark();
+					if (dynamic_cast<CDesc_1*>(storage.getObject()) != NULL)
+						dynamic_cast<CDesc_1*>(storage.getObject())->mew();
+					else if (dynamic_cast<CDesc_3*>(storage.getObject()) != NULL)
+						dynamic_cast<CDesc_3*>(storage.getObject())->bark();
 
-					storage->next();
+					storage.next();
 				}
 				else addition(storage);
 			}
 			else addition(storage);
 		}
 		else
-			storage->first();
+			storage.first();
 
 	int t2 = clock();
 
@@ -230,24 +246,24 @@ int main()
 {
 	srand(time(0));
 
-	MyStorage* storage = new MyStorage();
+	MyStorage storage;
 
 	for (int i = 0; i < 10; i++)
 		addition(storage);
 
 	cout << "THE FIRST 10 ELEMENTS: " << endl << endl;
 
-	for (storage->first(); !storage->isEOL(); storage->next())
-		storage->getObject()->classname();
+	for (storage.first(); !storage.isEOL(); storage.next())
+		storage.getObject()->classname();
 
 	cout << "\nCYCLE 100!" << endl << endl;
 	cycle(storage, 100);
 
 	cout << "\nCYCLE 1000!" << endl << endl;
-	cycle(storage, 1000);
+	//cycle(storage, 1000);
 
 	cout << "\nCYCLE 10000!" << endl << endl;
-	cycle(storage, 10000);
+	//cycle(storage, 10000);
 
 	return 0;
 }
